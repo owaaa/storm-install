@@ -2,7 +2,7 @@
 
 #########################################
 # Run via
-#wget https://raw.github.com/owaaa/storm-install/master/storm_install.sh && chmod +x storm_install.sh && ./storm_install.sh all <Amazon Internal Nimbus DNS> /opt
+#wget https://raw.github.com/owaaa/storm-install/master/storm_install.sh && chmod +x storm_install.sh && sudo ./storm_install.sh all <amazon internal ip> /opt
 #########################################
 
 pp() {
@@ -207,7 +207,7 @@ storm() {
 	mkdir $STORM_DIR >/dev/null
 	mkdir $STORM_DATADIR >/dev/null
     mkdir -p $STORM_LOG >/dev/null
-    sudo mkdir $STORM_HOME >/dev/null
+    sudo mkdir -p $STORM_HOME >/dev/null
     
     sudo groupadd -g 53001 storm    
     sudo useradd -u 53001 -g 53001 -d $STORM_HOME -s /bin/bash storm -c "Storm service account"
