@@ -44,6 +44,7 @@ failovermethod=priority
 enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+
 EOF
     sudo yum install supervisor
     sudo chkconfig supervisord on
@@ -235,105 +236,105 @@ storm() {
     
     #Put storm under supervision
         cat << EOF > $SUPERVISOR_CONFIG
-            [unix_http_server]
-            file=/var/tmp/supervisor.sock ;
-            
-            [supervisord]
-            logfile=/var/log/supervisor/supervisord.log 
-            logfile_maxbytes=50MB
-            logfile_backups=10
-            loglevel=info
-            pidfile=/var/run/supervisord.pid
-            nodaemon=false
-            minfds=1024
-            minprocs=200
-            
-            [rpcinterface:supervisor]
-            supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-            
-            [supervisorctl]
-            serverurl=unix:///var/tmp/supervisor.sock
-        
-            [program:storm-nimbus]
-            command=$STORM_DIR/bin/storm nimbus
-            user=storm
-            autostart=true
-            autorestart=true
-            startsecs=10
-            startretries=999
-            log_stdout=true
-            log_stderr=true
-            stdout_logfile=$STORM_LOG/nimbus.out
-            stdout_logfile_maxbytes=20MB
-            stdout_logfile_backups=10
-            
-            [program:storm-ui]
-            command=$STORM_DIR/bin/storm ui
-            user=storm
-            autostart=true
-            autorestart=true
-            startsecs=10
-            startretries=999
-            log_stdout=true
-            log_stderr=true
-            stdout_logfile=$STORM_LOG/ui.out
-            stdout_logfile_maxbytes=20MB
-            stdout_logfile_backups=10
-            
-            [program:storm-supervisor]
-            command=$STORM_DIR/bin/storm supervisor
-            user=storm
-            autostart=true
-            autorestart=true
-            startsecs=10
-            startretries=999
-            log_stdout=true
-            log_stderr=true
-            stdout_logfile=$STORM_LOG/supervisor.out
-            stdout_logfile_maxbytes=20MB
-            stdout_logfile_backups=10
-            
-            [program:zookeeper]
-            command = java -cp $ZK_CP -Xmx1024M -Xms1024M org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
-            stdout_logfile = $ZK_LOG/zookeeper.out
-            stderr_logfile = $ZK_LOG/zookeeper.err
-            autorestart = true
+[unix_http_server]
+file=/var/tmp/supervisor.sock ;
+ 
+[supervisord]
+logfile=/var/log/supervisor/supervisord.log 
+logfile_maxbytes=50MB
+logfile_backups=10
+loglevel=info
+pidfile=/var/run/supervisord.pid
+nodaemon=false
+minfds=1024
+minprocs=200
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///var/tmp/supervisor.sock
+
+[program:storm-nimbus]
+command=$STORM_DIR/bin/storm nimbus
+user=storm
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+log_stdout=true
+log_stderr=true
+stdout_logfile=$STORM_LOG/nimbus.out
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10
+
+[program:storm-ui]
+command=$STORM_DIR/bin/storm ui
+user=storm
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+log_stdout=true
+log_stderr=true
+stdout_logfile=$STORM_LOG/ui.out
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10
+
+[program:storm-supervisor]
+command=$STORM_DIR/bin/storm supervisor
+user=storm
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+log_stdout=true
+log_stderr=true
+stdout_logfile=$STORM_LOG/supervisor.out
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10
+
+[program:zookeeper]
+command = java -cp $ZK_CP -Xmx1024M -Xms1024M org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
+stdout_logfile = $ZK_LOG/zookeeper.out
+stderr_logfile = $ZK_LOG/zookeeper.err
+autorestart = true
 EOF
 	
     else
     
-        cat << EOF > $SUPERVISOR_CONFIG
-            [unix_http_server]
-            file=/var/tmp/supervisor.sock ;
-            
-            [supervisord]
-            logfile=/var/log/supervisor/supervisord.log 
-            logfile_maxbytes=50MB
-            logfile_backups=10
-            loglevel=info
-            pidfile=/var/run/supervisord.pid
-            nodaemon=false
-            minfds=1024
-            minprocs=200
-            
-            [rpcinterface:supervisor]
-            supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-            
-            [supervisorctl]
-            serverurl=unix:///var/tmp/supervisor.sock
-        
-            [program:storm-supervisor]
-            command=$STORM_DIR/bin/storm supervisor
-            user=storm
-            autostart=true
-            autorestart=true
-            startsecs=10
-            startretries=999
-            log_stdout=true
-            log_stderr=true
-            stdout_logfile=$STORM_LOG/supervisor.out
-            stdout_logfile_maxbytes=20MB
-            stdout_logfile_backups=10
+cat << EOF > $SUPERVISOR_CONFIG
+[unix_http_server]
+file=/var/tmp/supervisor.sock ;
+
+[supervisord]
+logfile=/var/log/supervisor/supervisord.log 
+logfile_maxbytes=50MB
+logfile_backups=10
+loglevel=info
+pidfile=/var/run/supervisord.pid
+nodaemon=false
+minfds=1024
+minprocs=200
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///var/tmp/supervisor.sock
+
+[program:storm-supervisor]
+command=$STORM_DIR/bin/storm supervisor
+user=storm
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+log_stdout=true
+log_stderr=true
+stdout_logfile=$STORM_LOG/supervisor.out
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10
 EOF
     fi
 
@@ -387,7 +388,7 @@ then
 
 		pp "Installation complete."
 		pp "Be sure to carefully read the log."
-		pp "Now, to run the storm cluster, use the 'screen' utility to execute"
+		pp "Now, to run the storm cluster, use the 'sudo service supervisord start' to execute"
 		pp "\t\$ "$START_SH
 		pp "and detach from the screen session using Ctrl+A Ctrl+D."
 	else
