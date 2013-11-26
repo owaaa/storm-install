@@ -35,7 +35,17 @@ deps() {
 	sudo yum install screen uuid-dev git libtool build-essential openjdk-6-jdk unzip
 	echo
     ##Enable EPEL on Amazon
-    sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
+   # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
+   sudo cat << EOF > /etc/yum.repos.d/epel.repo
+   [epel]
+   name=Extra Packages for Enterprise Linux 6 - $basearch
+   #baseurl=http://download.fedoraproject.org/pub/epel/6/$basearch
+   mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch
+   failovermethod=priority
+   enabled=1
+   gpgcheck=1
+   gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+EOF
     sudo yum install supervisor
     sudo chkconfig supervisord on
     sudo chmod 600 /etc/supervisord.conf
@@ -192,10 +202,10 @@ storm() {
 	pp "Installing Storm "$STORM_VERSION"..."
 	mkdir $STORM_DIR >/dev/null
 	mkdir $STORM_DATADIR >/dev/null
-    sudo mkdir -p STORM_LOG >/dev/null
+    mkdir -p $STORM_LOG >/dev/null
+    mkdir -p /app/home >/dev/null
     
-    sudo groupadd -g 53001 storm
-    sudo mkdir -p /app/home
+    sudo groupadd -g 53001 storm    
     sudo useradd -u 53001 -g 53001 -d /app/home/storm -s /bin/bash storm -c "Storm service account"
     sudo chmod 700 /app/home/storm
     sudo chage -I -1 -E -1 -m -1 -M -1 -W -1 -E -1 storm
@@ -221,7 +231,6 @@ storm() {
 	if [ "$HOST" = "$NIMBUS" ]; then 
     
     #Put storm under supervision
-    STORM_ACTION="nimbus"; 
         cat << EOF > $SUPERVISOR_CONFIG
             [unix_http_server]
             file=/var/tmp/supervisor.sock ;
@@ -286,9 +295,9 @@ storm() {
             stdout_logfile = $ZK_LOG/zookeeper.out
             stderr_logfile = $ZK_LOG/zookeeper.err
             autorestart = true
-        EOF
+EOF
 	
-    else STORM_ACTION="supervisor"; 
+    else
     
         cat << EOF > $SUPERVISOR_CONFIG
             [unix_http_server]
@@ -322,7 +331,7 @@ storm() {
             stdout_logfile=$STORM_LOG/supervisor.out
             stdout_logfile_maxbytes=20MB
             stdout_logfile_backups=10
-        EOF
+EOF
     fi
 	chmod +x $STORM_RUN
     sudo chown -R storm:storm $STORM_DIR
