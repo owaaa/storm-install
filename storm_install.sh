@@ -44,8 +44,7 @@ failovermethod=priority
 enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
-
-EOF       
+EOF   
     sudo yum install supervisor #need yum version first for service and other pieces
     sudo easy_install pip 
     sudo pip install supervisor --upgrade
