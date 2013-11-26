@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#########################################
+# Run via
+#wget https://raw.github.com/owaaa/storm-install/master/storm_install.sh && chmod +x storm_install.sh && ./storm_install.sh all <Amazon Internal Nimbus DNS> /opt
+#########################################
+
 pp() {
 	echo -e "\e[00;32m"$1"\e[00m"
 }
