@@ -37,14 +37,13 @@ deps() {
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
    sudo cat << EOF > /etc/yum.repos.d/epel.repo
-   [epel]
-   name=Extra Packages for Enterprise Linux 6 - $basearch
-   #baseurl=http://download.fedoraproject.org/pub/epel/6/$basearch
-   mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch
-   failovermethod=priority
-   enabled=1
-   gpgcheck=1
-   gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+[epel]
+name=Extra Packages for Enterprise Linux 6 - $basearch
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
 EOF
     sudo yum install supervisor
     sudo chkconfig supervisord on
@@ -195,22 +194,26 @@ storm() {
 	STORM_INSTALLDIR=$STORM_DIR"/storm-"$STORM_VERSION
 	STORM_DATADIR=$STORM_DIR"/data"
 	STORM_CONF=$STORM_INSTALLDIR"/conf/storm.yaml"
-	STORM_RUN=$STORM_DIR"/run"
+	#STORM_RUN=$STORM_DIR"/run"
     STORM_LOG="/var/log/storm"
     SUPERVISOR_CONFIG="/etc/supervisord.conf"
+    STORM_HOME="/app/home/storm"
 
 	pp "Installing Storm "$STORM_VERSION"..."
 	mkdir $STORM_DIR >/dev/null
 	mkdir $STORM_DATADIR >/dev/null
     mkdir -p $STORM_LOG >/dev/null
-    mkdir -p /app/home >/dev/null
+    sudo mkdir $STORM_HOME >/dev/null
     
     sudo groupadd -g 53001 storm    
-    sudo useradd -u 53001 -g 53001 -d /app/home/storm -s /bin/bash storm -c "Storm service account"
-    sudo chmod 700 /app/home/storm
+    sudo useradd -u 53001 -g 53001 -d $STORM_HOME -s /bin/bash storm -c "Storm service account"
+    sudo chmod 700 $STORM_HOME
     sudo chage -I -1 -E -1 -m -1 -M -1 -W -1 -E -1 storm
     
+    sudo chown -R storm:storm $STORM_DIR
     sudo chown -R storm:storm $STORM_LOG
+    sudo chown -R storm:storm $STORM_HOME
+    sudo chmod 750 $STORM_HOME
     
 	pp "Downloading Storm..."
 	wget $STORM_ZIP_URL -q -O $STORM_ZIP
@@ -333,13 +336,8 @@ EOF
             stdout_logfile_backups=10
 EOF
     fi
-	chmod +x $STORM_RUN
-    sudo chown -R storm:storm $STORM_DIR
-    sudo chown -R storm:storm /app/storm
-    sudo chmod 750 /app/storm
-	#echo "supervise $STORM_DIR &" >> $START_SH
-	#echo "svc -x $STORM_DIR" >> $STOP_SH
-    sudo service supervisord start
+
+    #sudo service supervisord start
 }
 
 #########################################
