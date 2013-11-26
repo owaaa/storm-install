@@ -45,9 +45,9 @@ enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
 
-EOF
-    sudo easy_install pip    
+EOF       
     sudo yum install supervisor #need yum version first for service and other pieces
+    sudo easy_install pip 
     sudo pip install supervisor --upgrade
     sudo chkconfig supervisord on
     sudo chmod 600 /etc/supervisord.conf
@@ -214,11 +214,6 @@ storm() {
     sudo chmod 700 $STORM_HOME
     sudo chage -I -1 -E -1 -m -1 -M -1 -W -1 -E -1 storm
     
-    sudo chown -R storm:storm $STORM_DIR
-    sudo chown -R storm:storm $STORM_LOG
-    sudo chown -R storm:storm $STORM_HOME
-    sudo chmod 750 $STORM_HOME
-    
 	pp "Downloading Storm..."
 	wget $STORM_ZIP_URL -q -O $STORM_ZIP
 	unzip -qq $STORM_ZIP -d $STORM_DIR
@@ -232,6 +227,11 @@ storm() {
 	then
 		echo "nimbus.host: \""$NIMBUS"\"" >> $STORM_CONF
 	fi
+    
+    sudo chown -R storm:storm $STORM_DIR
+    sudo chown -R storm:storm $STORM_LOG
+    sudo chown -R storm:storm $STORM_HOME
+    sudo chmod 750 $STORM_HOME
 
 	# Supervisor directories/scripts + global start/stop scripts.
 	# Note: If we're NIMBUS, we run the 'nimbis' action instead.
