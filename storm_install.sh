@@ -27,8 +27,14 @@ cleanup() {
 deps() {
 	pp "Checking system dependencies..."
 	echo
-	sudo yum install screen daemontools uuid-dev git libtool build-essential openjdk-6-jdk unzip
+	sudo yum install screen uuid-dev git libtool build-essential openjdk-6-jdk unzip
 	echo
+    ##Enable EPEL on Amazon
+    sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
+    sudo yum install supervisor
+    sudo chkconfig supervisord on
+    sudo chmod 600 /etc/supervisord.conf
+    
 }
 
 #########################################
@@ -52,11 +58,13 @@ zookeeper() {
 	ZK_TARBALL_URL="http://apache.openmirror.de/zookeeper/zookeeper-"$ZK_VERSION"/zookeeper-"$ZK_VERSION".tar.gz"
 	ZK_TARBALL=$ZK_DIR/"zookeeper.tar.gz"
 	ZK_INSTALLDIR=$ZK_DIR/"zookeeper-"$ZK_VERSION
+    ZK_LOG="/var/log/zookeeper"
 
 	pp "Installing ZooKeeper "$ZK_VERSION" on nimbus host '"$HOST"'..."
 
 	mkdir $ZK_DIR &>/dev/null
 	mkdir $ZK_DATADIR &>/dev/null
+    mkdir $ZK_LOG >/dev/null
 
 	pp "Downloading ZooKeeper..."
 
@@ -173,11 +181,22 @@ storm() {
 	STORM_DATADIR=$STORM_DIR"/data"
 	STORM_CONF=$STORM_INSTALLDIR"/conf/storm.yaml"
 	STORM_RUN=$STORM_DIR"/run"
+    STORM_LOG="/var/log/storm"
+    SUPERVISOR_CONFIG="/etc/supervisord.conf"
 
 	pp "Installing Storm "$STORM_VERSION"..."
 	mkdir $STORM_DIR >/dev/null
 	mkdir $STORM_DATADIR >/dev/null
-
+    sudo mkdir -p STORM_LOG >/dev/null
+    
+    sudo groupadd -g 53001 storm
+    sudo mkdir -p /app/home
+    sudo useradd -u 53001 -g 53001 -d /app/home/storm -s /bin/bash storm -c "Storm service account"
+    sudo chmod 700 /app/home/storm
+    sudo chage -I -1 -E -1 -m -1 -M -1 -W -1 -E -1 storm
+    
+    sudo chown -R storm:storm $STORM_LOG
+    
 	pp "Downloading Storm..."
 	wget $STORM_ZIP_URL -q -O $STORM_ZIP
 	unzip -qq $STORM_ZIP -d $STORM_DIR
@@ -194,14 +213,119 @@ storm() {
 
 	# Supervisor directories/scripts + global start/stop scripts.
 	# Note: If we're NIMBUS, we run the 'nimbis' action instead.
-	if [ "$HOST" = "$NIMBUS" ]; then STORM_ACTION="nimbus"; else STORM_ACTION="supervisor"; fi
-	cat << EOF > $STORM_RUN
-#!/bin/bash
-$STORM_INSTALLDIR/bin/storm $STORM_ACTION
-EOF
+	if [ "$HOST" = "$NIMBUS" ]; then 
+    
+    #Put storm under supervision
+    STORM_ACTION="nimbus"; 
+        cat << EOF > $SUPERVISOR_CONFIG
+            [unix_http_server]
+            file=/var/tmp/supervisor.sock ;
+            
+            [supervisord]
+            logfile=/var/log/supervisor/supervisord.log 
+            logfile_maxbytes=50MB
+            logfile_backups=10
+            loglevel=info
+            pidfile=/var/run/supervisord.pid
+            nodaemon=false
+            minfds=1024
+            minprocs=200
+            
+            [rpcinterface:supervisor]
+            supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+            
+            [supervisorctl]
+            serverurl=unix:///var/tmp/supervisor.sock
+        
+            [program:storm-nimbus]
+            command=$STORM_DIR/bin/storm nimbus
+            user=storm
+            autostart=true
+            autorestart=true
+            startsecs=10
+            startretries=999
+            log_stdout=true
+            log_stderr=true
+            stdout_logfile=$STORM_LOG/nimbus.out
+            stdout_logfile_maxbytes=20MB
+            stdout_logfile_backups=10
+            
+            [program:storm-ui]
+            command=$STORM_DIR/bin/storm ui
+            user=storm
+            autostart=true
+            autorestart=true
+            startsecs=10
+            startretries=999
+            log_stdout=true
+            log_stderr=true
+            stdout_logfile=$STORM_LOG/ui.out
+            stdout_logfile_maxbytes=20MB
+            stdout_logfile_backups=10
+            
+            [program:storm-supervisor]
+            command=$STORM_DIR/bin/storm supervisor
+            user=storm
+            autostart=true
+            autorestart=true
+            startsecs=10
+            startretries=999
+            log_stdout=true
+            log_stderr=true
+            stdout_logfile=$STORM_LOG/supervisor.out
+            stdout_logfile_maxbytes=20MB
+            stdout_logfile_backups=10
+            
+            [program:zookeeper]
+            command = java -cp $ZK_CP -Xmx1024M -Xms1024M org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
+            stdout_logfile = $ZK_LOG/zookeeper.out
+            stderr_logfile = $ZK_LOG/zookeeper.err
+            autorestart = true
+        EOF
+	
+    else STORM_ACTION="supervisor"; 
+    
+        cat << EOF > $SUPERVISOR_CONFIG
+            [unix_http_server]
+            file=/var/tmp/supervisor.sock ;
+            
+            [supervisord]
+            logfile=/var/log/supervisor/supervisord.log 
+            logfile_maxbytes=50MB
+            logfile_backups=10
+            loglevel=info
+            pidfile=/var/run/supervisord.pid
+            nodaemon=false
+            minfds=1024
+            minprocs=200
+            
+            [rpcinterface:supervisor]
+            supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+            
+            [supervisorctl]
+            serverurl=unix:///var/tmp/supervisor.sock
+        
+            [program:storm-supervisor]
+            command=$STORM_DIR/bin/storm supervisor
+            user=storm
+            autostart=true
+            autorestart=true
+            startsecs=10
+            startretries=999
+            log_stdout=true
+            log_stderr=true
+            stdout_logfile=$STORM_LOG/supervisor.out
+            stdout_logfile_maxbytes=20MB
+            stdout_logfile_backups=10
+        EOF
+    fi
 	chmod +x $STORM_RUN
-	echo "supervise $STORM_DIR &" >> $START_SH
-	echo "svc -x $STORM_DIR" >> $STOP_SH
+    sudo chown -R storm:storm $STORM_DIR
+    sudo chown -R storm:storm /app/storm
+    sudo chmod 750 /app/storm
+	#echo "supervise $STORM_DIR &" >> $START_SH
+	#echo "svc -x $STORM_DIR" >> $STOP_SH
+    sudo service supervisord start
 }
 
 #########################################
