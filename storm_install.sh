@@ -33,10 +33,9 @@ deps() {
 	pp "Checking system dependencies..."
 	echo
 	sudo yum install screen uuid-dev git python libtool build-essential openjdk-6-jdk unzip
-	echo
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
-   sudo cat << EOF > /etc/yum.repos.d/epel.repo
+   cat << EOF > /etc/yum.repos.d/epel.repo
 [epel]
 name=Extra Packages for Enterprise Linux 6 - \$basearch
 mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=\$basearch
@@ -44,7 +43,9 @@ failovermethod=priority
 enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
-EOF   
+
+EOF
+
     sudo yum install supervisor #need yum version first for service and other pieces
     sudo easy_install pip 
     sudo pip install supervisor --upgrade
@@ -99,6 +100,9 @@ initLimit=5
 syncLimit=2
 server.1=$NIMBUS:2888:3888
 EOF
+
+    ZKRUN_CMD="java -Xmx1024M -Xms1024M -cp "$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain   "$ZK_CONF
+    export ZKRUN_CMD
 
 	# This host's id.
 	echo "1" > $ZK_DATADIR/myid
@@ -297,7 +301,7 @@ stdout_logfile_maxbytes=20MB
 stdout_logfile_backups=10
 
 [program:zookeeper]
-command = java -cp $ZK_CP -Xmx1024M -Xms1024M org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
+command =$ZKRUN_CMD
 stdout_logfile = $ZK_LOG/zookeeper.out
 stderr_logfile = $ZK_LOG/zookeeper.err
 autorestart = true
