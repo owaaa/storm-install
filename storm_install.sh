@@ -38,8 +38,8 @@ deps() {
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
    sudo cat << EOF > /etc/yum.repos.d/epel.repo
 [epel]
-name=Extra Packages for Enterprise Linux 6 - $basearch
-mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch
+name=Extra Packages for Enterprise Linux 6 - \$basearch
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=\$basearch
 failovermethod=priority
 enabled=1
 gpgcheck=1
