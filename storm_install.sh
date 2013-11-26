@@ -193,6 +193,7 @@ storm() {
 	STORM_ZIP_URL="https://dl.dropboxusercontent.com/s/t8m516l2kadt7c6/storm-"$STORM_VERSION".zip"
 	STORM_ZIP=$STORM_DIR"/storm.zip"
 	STORM_INSTALLDIR=$STORM_DIR"/storm-"$STORM_VERSION
+    STORM_BINDIR=$STORM_INSTALLDIR"/bin"
 	STORM_DATADIR=$STORM_DIR"/data"
 	STORM_CONF=$STORM_INSTALLDIR"/conf/storm.yaml"
 	#STORM_RUN=$STORM_DIR"/run"
@@ -256,7 +257,7 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 serverurl=unix:///var/tmp/supervisor.sock
 
 [program:storm-nimbus]
-command=$STORM_DIR/bin/storm nimbus
+command=$STORM_BINDIR/storm nimbus
 user=storm
 autostart=true
 autorestart=true
@@ -269,7 +270,7 @@ stdout_logfile_maxbytes=20MB
 stdout_logfile_backups=10
 
 [program:storm-ui]
-command=$STORM_DIR/bin/storm ui
+command=$STORM_BINDIR/storm ui
 user=storm
 autostart=true
 autorestart=true
@@ -282,7 +283,7 @@ stdout_logfile_maxbytes=20MB
 stdout_logfile_backups=10
 
 [program:storm-supervisor]
-command=$STORM_DIR/bin/storm supervisor
+command=$STORM_BINDIR/storm supervisor
 user=storm
 autostart=true
 autorestart=true
@@ -321,10 +322,10 @@ minprocs=200
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [supervisorctl]
-serverurl=unix:///var/tmp/supervisor.sock
+serverurl=unix:///var/tmp/supervisor.sock ;
 
 [program:storm-supervisor]
-command=$STORM_DIR/bin/storm supervisor
+command=$STORM_BINDIR/storm supervisor
 user=storm
 autostart=true
 autorestart=true
