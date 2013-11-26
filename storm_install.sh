@@ -32,7 +32,7 @@ cleanup() {
 deps() {
 	pp "Checking system dependencies..."
 	echo
-	sudo yum install screen uuid-dev git libtool build-essential openjdk-6-jdk unzip
+	sudo yum install screen uuid-dev git python libtool build-essential openjdk-6-jdk unzip
 	echo
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
@@ -46,7 +46,9 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
 
 EOF
-    sudo yum install supervisor
+    sudo easy_install pip
+    sudo pip install supervisor --upgrade
+    #sudo yum install supervisor
     sudo chkconfig supervisord on
     sudo chmod 600 /etc/supervisord.conf
     
