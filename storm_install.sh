@@ -46,9 +46,9 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
 
 EOF
-    sudo easy_install pip
+    sudo easy_install pip    
+    sudo yum install supervisor #need yum version first for service and other pieces
     sudo pip install supervisor --upgrade
-    #sudo yum install supervisor
     sudo chkconfig supervisord on
     sudo chmod 600 /etc/supervisord.conf
     
