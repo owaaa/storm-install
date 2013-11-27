@@ -32,7 +32,7 @@ cleanup() {
 deps() {
 	pp "Checking system dependencies..."
 	echo
-	sudo yum install screen uuid-devel libuuid-devel git python libtool unzip
+	sudo yum install -y screen uuid-devel libuuid-devel git python libtool unzip
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
    cat << EOF > /etc/yum.repos.d/epel.repo
@@ -46,9 +46,9 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
 
 EOF
 
-    sudo yum groupinstall "Development Tools"
+    sudo yum -y groupinstall "Development Tools"
 
-    sudo yum install supervisor #need yum version first for service and other pieces
+    sudo yum -y install supervisor #need yum version first for service and other pieces
     sudo easy_install pip 
     sudo pip install supervisor --upgrade
     sudo chkconfig supervisord on
@@ -128,12 +128,6 @@ EOF
 
 	# Run script.
 	ZK_CP=$ZK_INSTALLDIR/zookeeper-$ZK_VERSION.jar:$ZK_INSTALLDIR/lib/log4j-1.2.15.jar:$ZK_INSTALLDIR/conf
-	cat << EOF > $ZK_RUN
-#!/bin/bash
-_JAVA_OPTIONS="-Xmx1024M -Xms1024M"
-java -cp $ZK_CP org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
-EOF
-	chmod +x $ZK_RUN
     
     ZKRUN_CMD="java -Xmx1024M -Xms1024M -cp "$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain   "$ZK_CONF
     export ZKRUN_CMD
