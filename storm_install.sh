@@ -209,9 +209,10 @@ jzmq() {
 #########################################
 
 storm() {
-	STORM_VERSION="0.9.0-rc3"
+	STORM_VERSION="0.8.3-wip3"
 	STORM_DIR=$BASEDIR"/storm"
-	STORM_ZIP_URL="https://dl.dropboxusercontent.com/s/t8m516l2kadt7c6/storm-"$STORM_VERSION".zip"
+    STORM_ZIP_URL="https://www.dropbox.com/s/9682bqfez5vgejd/storm-"$STORM_VERSION".zip"
+	#STORM_ZIP_URL="https://dl.dropboxusercontent.com/s/t8m516l2kadt7c6/storm-"$STORM_VERSION".zip"
 	STORM_ZIP=$STORM_DIR"/storm.zip"
 	STORM_INSTALLDIR=$STORM_DIR"/storm-"$STORM_VERSION
     STORM_BINDIR=$STORM_INSTALLDIR"/bin"
