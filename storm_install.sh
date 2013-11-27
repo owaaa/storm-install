@@ -71,6 +71,8 @@ EOF
         sudo sh -c " echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile" ;
     fi
     source /etc/profile
+    export JAVA_HOME=/usr/java/jdk1.7.0_03/
+    export PATH=$PATH:$JAVA_HOME/bin'
     
 }
 
