@@ -101,9 +101,6 @@ syncLimit=2
 server.1=$NIMBUS:2888:3888
 EOF
 
-    ZKRUN_CMD="java -Xmx1024M -Xms1024M -cp "$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain   "$ZK_CONF
-    export ZKRUN_CMD
-    
 	# This host's id.
 	echo "1" > $ZK_DATADIR/myid
 
@@ -116,7 +113,7 @@ java -cp $ZK_CP org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
 EOF
 	chmod +x $ZK_RUN
     
-    ZKRUN_CMD="java -cp"$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain -XmX1024M -Xms1024M "$ZK_CONF
+    ZKRUN_CMD="java -Xmx1024M -Xms1024M -cp "$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain   "$ZK_CONF
     export ZKRUN_CMD
 
 	# Purge script to cleanup zookeeper log files.
