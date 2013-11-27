@@ -32,7 +32,7 @@ cleanup() {
 deps() {
 	pp "Checking system dependencies..."
 	echo
-	sudo yum install screen uuid-devel git python libtool unzip
+	sudo yum install screen uuid-devel libuuid-devel git python libtool unzip
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
    cat << EOF > /etc/yum.repos.d/epel.repo
@@ -68,8 +68,9 @@ EOF
         echo JAVA_HOME already set;   
     else  
         sudo sh -c " echo 'export JAVA_HOME=/usr/java/jdk1.7.0_03/' >> /etc/profile" ;  
+        sudo sh -c " echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile" ;
     fi
-    sudo source /etc/profile
+    source /etc/profile
     
 }
 
