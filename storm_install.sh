@@ -32,7 +32,7 @@ cleanup() {
 deps() {
 	pp "Checking system dependencies..."
 	echo
-	sudo yum install screen uuid-dev git python libtool unzip
+	sudo yum install screen uuid-devel git python libtool unzip
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
    cat << EOF > /etc/yum.repos.d/epel.repo
@@ -54,7 +54,11 @@ EOF
     sudo chkconfig supervisord on
     sudo chmod 600 /etc/supervisord.conf
     
+    if [ ! -f ./jdk-7u3-linux-x64.rpm ]; then
+    echo "Installing Oracle JDK"
+
     wget --no-cookies --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2Ftechnetwork%2Fjava%2Fjavase%2Fdownloads%2Fjdk-7u3-download-1501626.html;" http://download.oracle.com/otn-pub/java/jdk/7u3-b04/jdk-7u3-linux-x64.rpm
+    fi
     sudo rpm -ivh jdk-7u3-linux-x64.rpm
     sudo /usr/sbin/alternatives --install /usr/bin/java java /usr/java/jdk1.7.0_03/bin/java 20000
     sudo /usr/sbin/alternatives --set java /usr/java/jdk1.7.0_03/bin/java
