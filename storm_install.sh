@@ -103,7 +103,7 @@ EOF
 
     ZKRUN_CMD="java -Xmx1024M -Xms1024M -cp "$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain   "$ZK_CONF
     export ZKRUN_CMD
-
+    
 	# This host's id.
 	echo "1" > $ZK_DATADIR/myid
 
