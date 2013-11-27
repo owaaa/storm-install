@@ -32,7 +32,7 @@ cleanup() {
 deps() {
 	pp "Checking system dependencies..."
 	echo
-	sudo yum install screen uuid-dev git python libtool build-essential openjdk-6-jdk unzip
+	sudo yum install screen uuid-dev git python libtool unzip
     ##Enable EPEL on Amazon
    # sed '0,/enabled=1/s/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel.repo
    cat << EOF > /etc/yum.repos.d/epel.repo
@@ -45,6 +45,8 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
 
 EOF
+
+    sudo yum groupinstall "Development Tools"
 
     sudo yum install supervisor #need yum version first for service and other pieces
     sudo easy_install pip 
@@ -63,7 +65,7 @@ EOF
     else  
         sudo sh -c " echo 'export JAVA_HOME=/usr/java/jdk1.7.0_03/' >> /etc/profile" ;  
     fi
-    source /etc/profile
+    sudo source /etc/profile
     
 }
 
