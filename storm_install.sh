@@ -116,7 +116,7 @@ java -cp $ZK_CP org.apache.zookeeper.server.quorum.QuorumPeerMain $ZK_CONFIGFILE
 EOF
 	chmod +x $ZK_RUN
     
-    ZKRUN_CMD="java -cp"$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain -XmX1024M -Xms1024M "$ZK_CONFIGFILE
+    ZKRUN_CMD="java -cp"$ZK_CP" org.apache.zookeeper.server.quorum.QuorumPeerMain -XmX1024M -Xms1024M "$ZK_CONF
     export ZKRUN_CMD
 
 	# Purge script to cleanup zookeeper log files.
