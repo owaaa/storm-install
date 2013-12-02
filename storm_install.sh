@@ -135,7 +135,7 @@ EOF
 	# Purge script to cleanup zookeeper log files.
 	cat << EOF > $ZK_PURGE
 mkdir $ZK_DIR/snap
-java -cp $ZK_CP org.apache.zookeeper.server.PurgeTxnLog $ZK_DATADIR $ZK_DIR/snap -n 3
+java -cp $ZK_CP org.apache.zookeeper.server.PurgeTxnLog $ZK_DATADIR $ZK_DATADIR -n 3
 rm -r $ZK_DIR/snap
 EOF
 	chmod +x $ZK_PURGE
